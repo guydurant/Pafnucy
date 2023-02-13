@@ -357,7 +357,7 @@ def train_model(args):
 
             if mse_v <= err:
                 err = mse_v
-                checkpoint = saver.save(session, args.model_name, global_step=global_step)
+                checkpoint = saver.save(session, 'temp_models/'+args.model_name, global_step=global_step)
 
                 # feature importance
                 summary_imp = tf.Summary()
