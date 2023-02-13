@@ -9,8 +9,8 @@ import h5py
 from sklearn.utils import shuffle
 import tensorflow as tf
 
-from tfbio.data import Featurizer, make_grid, rotate
-import tfbio.net
+from featuriser import Featurizer, make_grid, rotate
+import net
 
 import os.path
 
@@ -212,7 +212,7 @@ print(num_batches['test'], 'test batches')
 print('')
 print(args.num_epochs, 'epochs, best', args.to_keep, 'saved')
 
-graph = tfbio.net.make_SB_network(isize=isize, in_chnls=in_chnls, osize=osize,
+graph = net.make_SB_network(isize=isize, in_chnls=in_chnls, osize=osize,
                                   conv_patch=args.conv_patch,
                                   pool_patch=args.pool_patch,
                                   conv_channels=args.conv_channels,
@@ -226,7 +226,7 @@ train_writer = tf.summary.FileWriter(os.path.join(logdir, 'training_set'),
 val_writer = tf.summary.FileWriter(os.path.join(logdir, 'validation_set'),
                                    flush_secs=1)
 
-net_summaries, training_summaries = tfbio.net.make_summaries_SB(graph)
+net_summaries, training_summaries = net.make_summaries_SB(graph)
 
 x = graph.get_tensor_by_name('input/structure:0')
 y = graph.get_tensor_by_name('output/prediction:0')
@@ -265,7 +265,7 @@ with tf.Session(graph=graph) as session:
 
     summary_imp = tf.Summary()
     feature_imp = session.run(feature_importance)
-    image = tfbio.net.feature_importance_plot(feature_imp)
+    image = net.feature_importance_plot(feature_imp)
     summary_imp.value.add(tag='feature_importance_%s' % 0, image=image)
     train_writer.add_summary(summary_imp, 0)
 
@@ -336,7 +336,7 @@ with tf.Session(graph=graph) as session:
         # predictions distribution
         summary_pred = tf.Summary()
         summary_pred.value.add(tag='predictions_all',
-                               histo=tfbio.net.custom_summary_histogram(pred_t))
+                               histo=net.custom_summary_histogram(pred_t))
         train_writer.add_summary(summary_pred, global_step.eval())
 
         # validation set error
@@ -365,7 +365,7 @@ with tf.Session(graph=graph) as session:
             # feature importance
             summary_imp = tf.Summary()
             feature_imp = session.run(feature_importance)
-            image = tfbio.net.feature_importance_plot(feature_imp)
+            image = net.feature_importance_plot(feature_imp)
             summary_imp.value.add(tag='feature_importance', image=image)
             train_writer.add_summary(summary_imp, global_step.eval())
 
@@ -412,7 +412,7 @@ for set_name, tab in predictions.groupby('set'):
                          annot_kws={'title': '%s set (rmse=%.3f)'
                                              % (set_name, rmse[set_name])})
 
-    image = tfbio.net.custom_summary_image(grid.fig)
+    image = net.custom_summary_image(grid.fig)
     grid.fig.savefig(prefix + '-%s.pdf' % set_name)
     summary_pred = tf.Summary()
     summary_pred.value.add(tag='predictions_%s' % (set_name),
