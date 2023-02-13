@@ -11,6 +11,7 @@ from rdkit import Chem
 from rdkit.Chem import rdMolTransforms
 from math import sqrt, ceil
 from sklearn.utils import shuffle
+from tqdm import tqdm
 
 
 def load_csv(csv_file, data_dir):
@@ -86,7 +87,7 @@ def featurise_data(csv_file, data_dir):
     protein_files, ligand_files, keys, pks = load_csv(csv_file, data_dir)
     featurizer = Featurizer()
     with h5py.File(f"temp_features/{csv_file.split('/')[-1].split('.')[0]}.hdf", 'w') as f:
-        for ligand_file in ligand_files:
+        for ligand_file in tqdm(ligand_files):
             # use filename without extension as dataset name
             name = keys[ligand_files.index(ligand_file)]
 
@@ -356,7 +357,7 @@ def train_model(args):
 
             if mse_v <= err:
                 err = mse_v
-                # checkpoint = saver.save(session, prefix, global_step=global_step)
+                checkpoint = saver.save(session, args.model_name, global_step=global_step)
 
                 # feature importance
                 summary_imp = tf.Summary()
@@ -390,6 +391,8 @@ if __name__ == '__main__':
         if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.pkl'):
             print('Extracting features...')
             featurise_data(args.val_csv_file, args.val_data_dir)
+    else:
+        raise ValueError('No action specified')
         
         
 
