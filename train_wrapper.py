@@ -72,10 +72,10 @@ def calculate_charges_for_pocket(key):
 def get_pocket(protein_file, ligand_file, key):
     featurizer = Featurizer()
     make_20_box_around_ligand(protein_file, ligand_file, key)
-    calculate_charges_for_pocket(key)
-    pocket_file = f"temp_files/{key}_pocket.mol2"
+    # calculate_charges_for_pocket(key)
+    pocket_file = f"temp_files/{key}_pocket.pdb"
     # try:
-    pocket = next(pybel.readfile('mol2', pocket_file))
+    pocket = next(pybel.readfile('pdb', pocket_file))
     # except:
     #     raise IOError('Cannot read %s file' % pocket_file)
     pocket_coords, pocket_features = featurizer.get_features(pocket, molcode=-1)
