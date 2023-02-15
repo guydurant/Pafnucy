@@ -135,7 +135,7 @@ def train_model(args):
     affinity = {}
     coords = {}
     features = {}
-    datasets = {'training': args.csv_file, 'valididation': args.valid_csv_file}
+    datasets = {'training': args.csv_file, 'validation': args.val_csv_file}
 
     featurizer = Featurizer()
     columns = {name: i for i, name in enumerate(featurizer.FEATURE_NAMES)}
