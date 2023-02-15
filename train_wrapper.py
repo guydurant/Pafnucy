@@ -86,7 +86,7 @@ def get_pocket(protein_file, ligand_file, key):
 def featurise_data(csv_file, data_dir):
     protein_files, ligand_files, keys, pks = load_csv(csv_file, data_dir)
     featurizer = Featurizer()
-    with h5py.File(f"temp_features/{csv_file.split('/')[-1].split('.')[0]}.hdf", 'w') as f:
+    with h5py.File(f"temp_features/{csv_file.split('/')[-1].split('.')[0]}_features.hdf", 'w') as f:
         for ligand_file in tqdm(ligand_files):
             # use filename without extension as dataset name
             name = keys[ligand_files.index(ligand_file)]
@@ -145,7 +145,7 @@ def train_model(args):
             dictionary[dataset_name] = []
 
     for dataset_name in datasets.keys():
-        dataset_path = f'temp_features/{datasets[dataset_name].split("/")[-1].split(".")[0]}_features.pkl'
+        dataset_path = f'temp_features/{datasets[dataset_name].split("/")[-1].split(".")[0]}_features.hdf'
         with h5py.File(dataset_path, 'r') as f:
             for pdb_id in f:
                 dataset = f[pdb_id]
