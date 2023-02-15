@@ -380,15 +380,15 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if args.train:
-        if not os.path.exists(f'temp_features/{args.csv_file.split("/")[-1].split(".")[0]}_features.pkl'):
+        if not os.path.exists(f'temp_features/{args.csv_file.split("/")[-1].split(".")[0]}_features.hdf'):
             print('Extracting features...')
             featurise_data(args.csv_file, args.data_dir)
-        if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.pkl'):
+        if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'):
             print('Extracting features...')
             featurise_data(args.val_csv_file, args.val_data_dir)
         train_model(args)
     elif args.predict:
-        if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.pkl'):
+        if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'):
             print('Extracting features...')
             featurise_data(args.val_csv_file, args.val_data_dir)
     else:
