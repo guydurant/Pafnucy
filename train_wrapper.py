@@ -115,10 +115,10 @@ def featurise_data(csv_file, data_dir):
                                     dtype='float32', compression='lzf')
             dataset.attrs['affinity'] = pks[ligand_files.index(ligand_file)]
 
-def get_batch(dataset_name, indices, rotation=0):
+def get_batch(dataset_name, indices, coords, features, std, rotation=0,):
     featurizer = Featurizer()
     columns = {name: i for i, name in enumerate(featurizer.FEATURE_NAMES)}
-    global coords, features, std
+    # global coords, features, std
     x = []
     for i, idx in enumerate(indices):
         coords_idx = rotate(coords[dataset_name][idx], rotation)
@@ -176,7 +176,7 @@ def train_model(args):
 
     print('\n---- DATA ----\n')
 
-    tmp = get_batch('training', range(min(50, len(features['training']))))
+    tmp = get_batch('training', range(min(50, len(features['training']))), coords, features, std)
 
     assert ((tmp[:, :, :, :, columns['molcode']] == 0.0).any()
             and (tmp[:, :, :, :, columns['molcode']] == 1.0).any()
