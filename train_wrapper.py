@@ -377,6 +377,35 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', type=str, default='test')
     parser.add_argument('--train', action='store_true')
     parser.add_argument('--predict', action='store_true')
+    parser.add_argument('--grid_spacing', '-g', default=1.0, type=float,
+                      help='distance between grid points')
+    parser.add_argument('--max_dist', '-d', default=10.0, type=float,
+                      help='max distance from complex center')
+    parser.add_argument('--conv_patch', default=5, type=int,
+                       help='patch size for convolutional layers')
+    parser.add_argument('--pool_patch', default=2, type=int,
+                       help='patch size for pooling layers')
+    parser.add_argument('--conv_channels', metavar='C', default=[64, 128, 256],
+                       type=int, nargs='+',
+                       help='number of fileters in convolutional layers')
+    parser.add_argument('--dense_sizes', metavar='D', default=[1000, 500, 200],
+                       type=int, nargs='+',
+                       help='number of neurons in dense layers')
+    parser.add_argument('--keep_prob', dest='kp', default=0.5, type=float,
+                       help='keep probability for dropout')
+    parser.add_argument('--l2', dest='lmbda', default=0.001, type=float,
+                       help='lambda for weight decay')
+    parser.add_argument('--rotations', metavar='R', default=list(range(24)),
+                       type=int, nargs='+',
+                       help='rotations to perform')
+    parser.add_argument('--learning_rate', default=1e-5, type=float,
+                      help='learning rate')
+    parser.add_argument('--batch_size', default=20, type=int,
+                      help='batch size')
+    parser.add_argument('--num_epochs', default=20, type=int,
+                      help='number of epochs')
+    parser.add_argument('--num_checkpoints', dest='to_keep', default=10, type=int,
+                      help='number of checkpoints to keep')
 
     args = parser.parse_args()
     if args.train:
