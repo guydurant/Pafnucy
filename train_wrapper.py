@@ -243,7 +243,6 @@ def train_model(args):
     
     def batches(set_name):
         """Batch generator, yields slice indices"""
-        global num_batches, args, ds_sizes
         for b in range(num_batches[set_name]):
             bi = b * args.batch_size
             bj = (b + 1) * args.batch_size
