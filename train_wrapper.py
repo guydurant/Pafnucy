@@ -202,7 +202,7 @@ def train_model(args):
     # NET PARAMS
 
     ds_sizes = {dataset: len(affinity[dataset]) for dataset in datasets.keys()}
-    _, isize, *_, in_chnls = get_batch('training', [0]).shape
+    _, isize, *_, in_chnls = get_batch('training', [0], coords, features, std).shape
     osize = 1
 
     for set_name, set_size in ds_sizes.items():
@@ -266,12 +266,12 @@ def train_model(args):
         summary_imp.value.add(tag='feature_importance_%s' % 0, image=image)
         # train_writer.add_summary(summary_imp, 0)
 
-        stats_net = session.run(
-            net_summaries,
-            feed_dict={x: get_batch('training', range(train_sample)),
-                    t: affinity['training'][:train_sample],
-                    keep_prob: 1.0}
-        )
+        # stats_net = session.run(
+        #     net_summaries,
+        #     feed_dict={x: get_batch('training', range(train_sample), coords, features, std),
+        #             t: affinity['training'][:train_sample],
+        #             keep_prob: 1.0}
+        # )
 
         # train_writer.add_summary(stats_net, 0)
 
@@ -283,27 +283,27 @@ def train_model(args):
 
                 for bi, bj in batches('training'):
                     session.run(train, feed_dict={x: get_batch('training',
-                                                            x_t[bi:bj],
+                                                            x_t[bi:bj], coords, features, std,
                                                             rotation),
                                                 t: y_t[bi:bj], keep_prob: args.kp})
 
                 # SAVE STATS - per rotation #
-                stats_t, stats_net = session.run(
-                    [training_summaries, net_summaries],
-                    feed_dict={x: get_batch('training', x_t[:train_sample]),
-                            t: y_t[:train_sample],
-                            keep_prob: 1.0}
-                )
+                # stats_t, stats_net = session.run(
+                #     [training_summaries, net_summaries],
+                #     feed_dict={x: get_batch('training', x_t[:train_sample], coords, features, std),
+                #             t: y_t[:train_sample],
+                #             keep_prob: 1.0}
+                # )
 
                 # train_writer.add_summary(stats_t, global_step.eval())
                 # train_writer.add_summary(stats_net, global_step.eval())
 
-                stats_v = session.run(
-                    training_summaries,
-                    feed_dict={x: get_batch('validation', range(val_sample)),
-                            t: affinity['validation'][:val_sample],
-                            keep_prob: 1.0}
-                )
+                # stats_v = session.run(
+                #     training_summaries,
+                #     feed_dict={x: get_batch('validation', range(val_sample)),
+                #             t: affinity['validation'][:val_sample],
+                #             keep_prob: 1.0}
+                # )
 
                 # val_writer.add_summary(stats_v, global_step.eval())
 
@@ -317,7 +317,7 @@ def train_model(args):
 
                 pred_t[bi:bj], mse_t[b] = session.run(
                     [y, mse],
-                    feed_dict={x: get_batch('training', x_t[bi:bj]),
+                    feed_dict={x: get_batch('training', x_t[bi:bj], coords, features, std),
                             t: y_t[bi:bj],
                             keep_prob: 1.0}
                 )
@@ -342,7 +342,7 @@ def train_model(args):
                 weight = (bj - bi) / ds_sizes['validation']
                 mse_v += weight * session.run(
                     mse,
-                    feed_dict={x: get_batch('validation', range(bi, bj)),
+                    feed_dict={x: get_batch('validation', range(bi, bj), coords, features, std),
                             t: affinity['validation'][bi:bj],
                             keep_prob: 1.0}
                 )
