@@ -274,7 +274,7 @@ def train_model(args):
 
         # train_writer.add_summary(stats_net, 0)
 
-        for epoch in range(args.num_epochs):
+        for epoch in tqdm(range(args.num_epochs)):
             for rotation in args.rotations:
                 print('rotation', rotation)
                 # TRAIN #
@@ -414,6 +414,7 @@ if __name__ == '__main__':
         if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'):
             print('Extracting features...')
             featurise_data(args.val_csv_file, args.val_data_dir)
+        print('Training model...')
         train_model(args)
     elif args.predict:
         if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'):
