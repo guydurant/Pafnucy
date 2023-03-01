@@ -425,7 +425,7 @@ def predict(args):
     #     print('restored network from %s\n' % args.network)
 
     with tf.Session() as session:
-        saver.restore(session, meta_name.split('.meta')[0])
+        saver.restore(session, meta_name_latest.split('.meta')[0])
         predictions = []
         batch_generator = __get_batch(args, charge_column, coords, features)
         for grid in batch_generator:
