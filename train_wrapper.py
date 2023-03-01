@@ -370,11 +370,11 @@ def __get_batch(args, charge_column, coords, features):
 
     batch_grid = []
 
-    if args.verbose:
-        if args.batch == 0:
-            print('predict for all complexes at once\n')
-        else:
-            print('%s samples per batch\n' % args.batch)
+    # if args.verbose:
+    #     if args.batch == 0:
+    #         print('predict for all complexes at once\n')
+    #     else:
+    #         print('%s samples per batch\n' % args.batch)
 
     for crd, f in zip(coords, features):
         batch_grid.append(make_grid(crd, f, max_dist=args.max_dist,
@@ -475,6 +475,10 @@ if __name__ == '__main__':
                       help='number of epochs')
     parser.add_argument('--num_checkpoints', dest='to_keep', default=10, type=int,
                       help='number of checkpoints to keep')
+    parser.add_argument('--charge_scaler', type=float, default=0.425896,
+                    help='scaling factor for the charge'
+                         ' (use the same factor when preparing data for'
+                         ' training and and for predictions)')
 
     args = parser.parse_args()
     if args.train:
