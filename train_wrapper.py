@@ -12,6 +12,7 @@ from rdkit.Chem import rdMolTransforms
 from math import sqrt, ceil
 from sklearn.utils import shuffle
 from tqdm import tqdm
+from glob import glob
 
 
 def load_csv(csv_file, data_dir):
@@ -365,6 +366,75 @@ def train_model(args):
                 summary_imp.value.add(tag='feature_importance', image=image)
                 # train_writer.add_summary(summary_imp, global_step.eval())
 
+def __get_batch(args, charge_column, coords, features):
+
+    batch_grid = []
+
+    if args.verbose:
+        if args.batch == 0:
+            print('predict for all complexes at once\n')
+        else:
+            print('%s samples per batch\n' % args.batch)
+
+    for crd, f in zip(coords, features):
+        batch_grid.append(make_grid(crd, f, max_dist=args.max_dist,
+                          grid_resolution=args.grid_spacing))
+        if len(batch_grid) == args.batch:
+            # if batch is not specified it will never happen
+            batch_grid = np.vstack(batch_grid)
+            batch_grid[..., charge_column] /= args.charge_scaler
+            yield batch_grid
+            batch_grid = []
+
+    if len(batch_grid) > 0:
+        batch_grid = np.vstack(batch_grid)
+        batch_grid[..., charge_column] /= args.charge_scaler
+        yield batch_grid
+
+def predict(args):
+    featurizer = Featurizer()
+
+    charge_column = featurizer.FEATURE_NAMES.index('partialcharge')
+
+    coords = []
+    features = []
+    names = []
+
+    input_file = f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'
+
+    with h5py.File(input_file, 'r') as f:
+        for name in f:
+            names.append(name)
+            dataset = f[name]
+            coords.append(dataset[:, :3])
+            features.append(dataset[:, 3:])
+
+
+    meta_name = glob(f'temp_models/{args.model_name}-*.meta')
+    # get the latest model
+    meta_name_latest = max(meta_name, key=os.path.getctime)
+    
+    saver = tf.train.import_meta_graph(meta_name_latest,
+                                   clear_devices=True)
+
+    predict = tf.get_collection('output')[0]
+    inp = tf.get_collection('input')[0]
+    kp = tf.get_collection('kp')[0]
+
+    if args.verbose:
+        print('restored network from %s\n' % args.network)
+
+    with tf.Session() as session:
+        saver.restore(session, args.network)
+        predictions = []
+        batch_generator = __get_batch(args, charge_column, coords, features)
+        for grid in batch_generator:
+            # TODO: remove kp in next release
+            # it's here for backward compatibility
+            predictions.append(session.run(predict, feed_dict={inp: grid, kp: 1.0}))
+    
+    return predictions
+
 
 if __name__ == '__main__':
     import argparse
@@ -420,6 +490,8 @@ if __name__ == '__main__':
         if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'):
             print('Extracting features...')
             featurise_data(args.val_csv_file, args.val_data_dir)
+        predictions = predict(args)
+        
     else:
         raise ValueError('No action specified')
         
