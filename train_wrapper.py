@@ -490,8 +490,10 @@ if __name__ == '__main__':
         if not os.path.exists(f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'):
             print('Extracting features...')
             featurise_data(args.val_csv_file, args.val_data_dir)
+        proteins, ligands, keys, pks = load_csv(args.val_csv_file, args.val_data_dir)
         predictions = predict(args)
-        
+        df = pd.DataFrame({'key': keys, 'pred': predictions, 'pk': pks})
+        df.to_csv(f'results/{args.model_name}_{args.val_csv_file.split("/")[-1]}', index=False)
     else:
         raise ValueError('No action specified')
         
