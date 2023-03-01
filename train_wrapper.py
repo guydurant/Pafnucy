@@ -432,8 +432,9 @@ def predict(args):
             # TODO: remove kp in next release
             # it's here for backward compatibility
             predictions.append(session.run(predict, feed_dict={inp: grid, kp: 1.0}))
+        print(predictions)
     
-    return predictions
+    return np.array(predictions).reshape(-1)
 
 
 if __name__ == '__main__':
