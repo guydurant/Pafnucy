@@ -379,7 +379,7 @@ def __get_batch(args, charge_column, coords, features):
     for crd, f in zip(coords, features):
         batch_grid.append(make_grid(crd, f, max_dist=args.max_dist,
                           grid_resolution=args.grid_spacing))
-        if len(batch_grid) == args.batch:
+        if len(batch_grid) == args.batch_size:
             # if batch is not specified it will never happen
             batch_grid = np.vstack(batch_grid)
             batch_grid[..., charge_column] /= args.charge_scaler
