@@ -421,8 +421,8 @@ def predict(args):
     inp = tf.get_collection('input')[0]
     kp = tf.get_collection('kp')[0]
 
-    if args.verbose:
-        print('restored network from %s\n' % args.network)
+    # if args.verbose:
+    #     print('restored network from %s\n' % args.network)
 
     with tf.Session() as session:
         saver.restore(session, args.network)
