@@ -71,7 +71,7 @@ def read_pdb_line(line):
 
 def make_20_box_around_ligand(protein_file, ligand_file, key, csv_file):
     if not os.path.exists(f'data/scratch/{csv_file.split("/")[-1].split(".")[0]}'):
-        os.mkdir(f'data/scratch/{csv_file.split("/")[-1].split(".")[0]}')
+        os.makedirs(f'data/scratch/{csv_file.split("/")[-1].split(".")[0]}')
     mol = Chem.MolFromMolFile(ligand_file)
     centroid = Chem.rdMolTransforms.ComputeCentroid(mol.GetConformer())
     box_vertices = vertices(centroid[0], centroid[1], centroid[2], 20)
