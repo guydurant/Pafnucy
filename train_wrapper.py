@@ -119,6 +119,8 @@ def get_pocket(protein_file, ligand_file, key, csv_file):
 def featurise_data(csv_file, data_dir):
     protein_files, ligand_files, keys, pks = load_csv(csv_file, data_dir)
     featurizer = Featurizer()
+    if not os.path.exists("data/features"):
+        os.makedirs("data/features")
     with h5py.File(
         f"data/features/{csv_file.split('/')[-1].split('.')[0]}_features.hdf", "w"
     ) as f:
@@ -584,7 +586,7 @@ if __name__ == "__main__":
         train_model(args)
     elif args.predict:
         if not os.path.exists(
-            f'temp_features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'
+            f'data/features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'
         ):
             print("Extracting features...")
             featurise_data(args.val_csv_file, args.val_data_dir)
