@@ -27,16 +27,6 @@ def load_csv(csv_file, data_dir):
     return protein_files, ligand_files, keys, pks
 
 
-# def make_protein_pocket_file(protein_file, ligand_file, key):
-#     cmd.load(protein_file, 'protein')
-#     # cmd.load(f'temp_files/{protein_file.split("/")[-1].split(".")[0]}_charged.mol2', 'protein')
-#     cmd.load(ligand_file, 'ligand')
-#     cmd.select('pocket', 'byres (ligand around 6)')
-#     cmd.save(f'temp_files/{key}_pocket.mol2', 'pocket')
-#     cmd.delete('all')
-#     return None
-
-
 def vertices(Xc, Yc, Zc, SL):
     return [
         [Xc + SL / 2, Yc + SL / 2, Zc + SL / 2],
@@ -333,6 +323,8 @@ def train_model(args):
     val_sample = min(args.batch_size, len(features["validation"]))
 
     print("\n---- TRAINING ----\n")
+    if not os.path.exists("data/models"):
+        os.makedirs("data/models")
     with tf.Session(graph=graph) as session:
         session.run(tf.global_variables_initializer())
 
@@ -408,7 +400,7 @@ def train_model(args):
             if mse_v <= err:
                 err = mse_v
                 checkpoint = saver.save(
-                    session, "temp_models/" + args.model_name, global_step=global_step
+                    session, "data/models/" + args.model_name, global_step=global_step
                 )
 
                 # feature importance
@@ -577,11 +569,6 @@ if __name__ == "__main__":
             f'data/features/{args.csv_file.split("/")[-1].split(".")[0]}_features.hdf'
         ):
             featurise_data(args.csv_file, args.data_dir)
-        if args.val_csv_file is not None:
-            if not os.path.exists(
-                f'data/features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'
-            ):
-                featurise_data(args.val_csv_file, args.val_data_dir)
         print("Training model...")
         train_model(args)
     elif args.predict:
