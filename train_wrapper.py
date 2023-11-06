@@ -571,7 +571,7 @@ if __name__ == "__main__":
             featurise_data(args.csv_file, args.data_dir)
         print("Training model...")
         train_model(args)
-    elif args.predict:
+    if args.predict:
         if not os.path.exists(
             f'data/features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'
         ):
@@ -582,9 +582,11 @@ if __name__ == "__main__":
         df = pd.DataFrame(
             {"key": reordered_keys, "pred": predictions, "pk": reordered_pks}
         )
+        if not os.path.exists("data/results"):
+            os.makedirs("data/results")
         df.to_csv(
             f'data/results/{args.model_name}_{args.val_csv_file.split("/")[-1]}',
             index=False,
         )
     else:
-        raise ValueError("No action specified")
+        raise ValueError("Please specify --train or --predict or both.")
