@@ -571,7 +571,7 @@ if __name__ == "__main__":
             featurise_data(args.csv_file, args.data_dir)
         print("Training model...")
         train_model(args)
-    if args.predict:
+    elif args.predict:
         if not os.path.exists(
             f'data/features/{args.val_csv_file.split("/")[-1].split(".")[0]}_features.hdf'
         ):
